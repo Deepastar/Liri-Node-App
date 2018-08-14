@@ -9,8 +9,16 @@ var keys = require('./keys.js');
 var spotify = new Spotify(keys.spotify);
 var twitterClient = new Twitter(keys.twitter);
 
+if(process.argv.length < 3 || process.argv.length > 4){
+    console.log("Invalid number of Parameters: " + process.argv.length);
+    process.exit();
+}
+
 runCommand(process.argv[2], process.argv[3]);
 
+/**
+ * Function gets the command line arguments and calls the appropriate functions to excute 
+ */
 function runCommand(command, commandArg){
     switch (command) {
         case "my-tweets": getTweets();
@@ -25,10 +33,14 @@ function runCommand(command, commandArg){
             break;
         case "do-what-it-says": readFromFile();
             break;
+        default: console.log("Invalid Parameter: " + command);
+        break;
     }
 }
 
-
+/**
+ * Function to access Twitter account and get the latest tweets.
+ */
 function getTweets() {
     var params = { user_id: "Deepa689" };
     twitterClient.get('statuses/user_timeline', params, function (error, tweets, response) {
@@ -40,6 +52,9 @@ function getTweets() {
     });
 }
 
+/**
+ * Function to get the movie that is being searched from the omdb.
+ */
 function getMovies(movieName) {
     if(!movieName || movieName === ""){
         movieName = "Mr. Nobody";
@@ -51,9 +66,6 @@ function getMovies(movieName) {
 
     Request(requestQueryUrl, function (error, response, body) {
         if (!error && response.statusCode === 200) {
-
-            // Parse the body of the site and recover just the imdbRating
-            // (Note: The syntax below for parsing isn't obvious. Just spend a few moments dissecting it).
             console.log("Title: " + JSON.parse(body).Title);
             console.log("Release Year: " + JSON.parse(body).Year);
             console.log("Imdb Rating: " + JSON.parse(body).imdbRating);
@@ -66,6 +78,9 @@ function getMovies(movieName) {
     });
 }
 
+/**
+ * Function to access the Spotify account and search for the given track.
+ */
 function getMusic(trackName) {
     if(!trackName || trackName === ""){
         trackName = "track:The+Sign";
@@ -96,6 +111,9 @@ function getMusic(trackName) {
     });
 }
 
+/**
+ * Function to read the random.txt and excute the command in it.
+ */
 function readFromFile() {
     fs.readFile("random.txt", "utf8", function (error, data) {
         if (error) {
